@@ -7,6 +7,7 @@ import pandas as pd
 import folium
 from folium import Choropleth, LayerControl
 import matplotlib.pyplot as plt
+import seaborn as sns  # Añadido seaborn que faltaba
 from streamlit_folium import folium_static
 import numpy as np
 
@@ -72,15 +73,11 @@ with tab1:
 
     st.subheader("Unidad de Análisis")
     st.write("""
-    La unidad de análisis de este proyecto es cada institución educativa (colegio) en el Perú.
-    Cada colegio está identificado de manera única por sus coordenadas geográficas (latitud y longitud) y su nivel educativo (Inicial, Primaria o Secundaria).
-    El análisis espacial agrega los colegios a nivel distrital para observar patrones de acceso educativo en el ámbito local.
-    """)
-
-    st.subheader("Fuentes de Datos")
-    st.write("""
-    - **Base de datos de colegios**: Ministerio de Educación del Perú (MINEDU), extraído del portal SIGMED (https://sigmed.minedu.gob.pe/mapaeducativo/).
-    - **Shapefile de límites distritales**: Fuente oficial del Instituto Nacional de Estadística e Informática (INEI).
+   La unidad de análisis de este proyecto corresponde a cada institución educativa en el territorio peruano.
+   Cada una de estas instituciones está individualizada mediante sus coordenadas geográficas (latitud y longitud), 
+   así como por el nivel educativo que ofrece (Inicial, Primaria o Secundaria).
+   El estudio espacial agrupa las escuelas a nivel distrital con el fin de identificar patrones de acceso a la educación 
+   en el ámbito local.
     """)
 
     st.subheader("Supuestos y Preprocesamiento")
@@ -93,7 +90,14 @@ with tab1:
     - El análisis de proximidad utiliza un buffer de 5 km alrededor de cada escuela para identificar escuelas secundarias cercanas a las primarias.
     - Se realizó un proceso de limpieza para garantizar la compatibilidad de los formatos entre el shapefile y los datos de los colegios.
     """)
-    
+
+
+    st.subheader("Fuentes de Datos")
+    st.write("""
+    - **Base de datos de escuelas**: Ministerio de Educación del Perú (MINEDU). (https://sigmed.minedu.gob.pe/mapaeducativo/)
+    - **Shapefile de distritos**: Instituto Nacional de Estadística e Informática (INEI).
+    """)
+
     # Descripción de las variables
     st.subheader("Descripción de Variables")
     st.write("La base de datos 'listado_iiee.xls' contiene las siguientes variables:")
@@ -144,44 +148,24 @@ with tab1:
     # Estadísticas básicas
     st.subheader("Estadísticas Básicas")
     
-    # Crear una columna para el nivel escolar correctamente
-    @st.cache_data
-    def prepare_data():
-        school_data = cv_data.copy()
-        
-        # Clasificar escuelas por nivel de manera mutuamente excluyente
-        school_data['nivel_escolar'] = None
-        school_data.loc[school_data['Nivel / Modalidad'].str.contains('Inicial', case=False, na=False) & 
-                        ~school_data['Nivel / Modalidad'].str.contains('Primaria|Secundaria', case=False, na=False), 'nivel_escolar'] = 'Inicial'
-        
-        school_data.loc[school_data['Nivel / Modalidad'].str.contains('Primaria', case=False, na=False) & 
-                        ~school_data['Nivel / Modalidad'].str.contains('Inicial|Secundaria', case=False, na=False), 'nivel_escolar'] = 'Primaria'
-        
-        school_data.loc[school_data['Nivel / Modalidad'].str.contains('Secundaria', case=False, na=False) & 
-                        ~school_data['Nivel / Modalidad'].str.contains('Inicial|Primaria', case=False, na=False), 'nivel_escolar'] = 'Secundaria'
-        
-        # Para escuelas con múltiples niveles, asignarles un nivel combinado
-        school_data.loc[school_data['nivel_escolar'].isnull() & 
-                       school_data['Nivel / Modalidad'].str.contains('Inicial|Primaria|Secundaria', case=False, na=False), 'nivel_escolar'] = 'Múltiple'
-        
-        return school_data
+    # CORRECCIÓN: Conteo correcto de escuelas por nivel
+    # Contar directamente cada nivel correctamente
+    total = len(cv_data)
+    iniciales = len(cv_data[cv_data['Nivel / Modalidad'].str.contains('Inicial', case=False, na=False)])
+    primarias = len(cv_data[cv_data['Nivel / Modalidad'].str.contains('Primaria', case=False, na=False)])
+    secundarias = len(cv_data[cv_data['Nivel / Modalidad'].str.contains('Secundaria', case=False, na=False)])
     
-    school_data = prepare_data()
-    
-    # Mostrar conteos por nivel correctamente
-    nivel_counts = school_data['nivel_escolar'].value_counts()
     
     # Crear columnas para métricas corregidas
     col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Total de Colegios", len(school_data))
-    col2.metric("Iniciales", nivel_counts.get('Inicial', 0))
-    col3.metric("Primarios", nivel_counts.get('Primaria', 0))
-    col4.metric("Secundarios", nivel_counts.get('Secundaria', 0))
-    col5.metric("Múltiples niveles", nivel_counts.get('Múltiple', 0))
-    
+    col1.metric("Total de Colegios", total)
+    col2.metric("Iniciales", iniciales)
+    col3.metric("Primarios", primarias)
+    col4.metric("Secundarios", secundarias)
+
     # Gráfico de distribución de colegios por departamento
     st.subheader("Distribución de Colegios por Departamento")
-    dept_counts = school_data['Departamento'].value_counts().reset_index()
+    dept_counts = cv_data['Departamento'].value_counts().reset_index()
     dept_counts.columns = ['Departamento', 'Cantidad']
     
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -226,38 +210,7 @@ with tab2:
         with [col1, col2, col3][i]:
             st.subheader(f"Nivel {nivel}")
             st.pyplot(fig)
-            
-    # Mostrar un análisis adicional debajo de los mapas
-    st.subheader("Análisis de Distribución por Niveles")
-    
-    # Obtener conteos por nivel para todos los distritos
-    all_counts = []
-    for nivel in niveles:
-        base_nivel = filtrar_escuelas_por_nivel(cv_data, nivel)
-        conteo = base_nivel.groupby(['UBIGEO']).size().reset_index(name=f'Cantidad_{nivel}')
-        all_counts.append(conteo)
-    
-    # Combinar los conteos
-    combined_counts = all_counts[0]
-    for i in range(1, len(all_counts)):
-        combined_counts = pd.merge(combined_counts, all_counts[i], on='UBIGEO', how='outer')
-    
-    combined_counts = combined_counts.fillna(0)
-    
-    # Análisis de correlación entre los niveles
-    correlation_matrix = combined_counts[['Cantidad_Inicial', 'Cantidad_Primaria', 'Cantidad_Secundaria']].corr()
-    
-    # Crear heatmap para la matriz de correlación
-    fig, ax = plt.subplots(figsize=(6, 5))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=.5, ax=ax)
-    ax.set_title('Correlación entre Cantidades de Colegios por Nivel')
-    st.pyplot(fig)
-    
-    st.write("""
-    El mapa de calor muestra la correlación entre los diferentes niveles educativos por distrito. 
-    Un valor cercano a 1 indica una fuerte correlación positiva, lo que significa que los distritos 
-    con muchas escuelas de un nivel también tienden a tener muchas escuelas de otro nivel.
-    """)
+
 
 # ============================================================
 # Tab 3: Mapas Dinámicos
