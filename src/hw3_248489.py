@@ -5,7 +5,7 @@
 
 # ### Create new environment:
 # 
-# conda create -name TAREA_TRES
+# conda creare -name TAREA_TRES
 # 
 # ### Activate new environment
 # 
@@ -17,7 +17,7 @@
 # 
 # ### Importar librerías
 
-# In[8]:
+# In[3]:
 
 
 # Manipulación de datos
@@ -49,14 +49,14 @@ import os
 
 # ### Lectura de la bbdd de  instituciones
 
-# In[9]:
+# In[4]:
 
 
 cv_data = pd.read_html('listado_iiee.xls')[0]
 print(cv_data.head())
 
 
-# In[10]:
+# In[5]:
 
 
 # Cambiamos el nombre de Ubigeo para poder hacer el merge luego
@@ -66,14 +66,14 @@ cv_data.head(5)
 
 # ### Importación del Shape File por distritos
 
-# In[11]:
+# In[6]:
 
 
 maps = gpd.read_file('../shape_file/DISTRITOS.shp')
 maps.head(5)
 
 
-# In[12]:
+# In[7]:
 
 
 # Nos quedamos con las columnas relevantes y cambiamos el nombre de IDDIST para hacer el merge luego
@@ -82,7 +82,7 @@ maps = maps.rename({'IDDIST':'UBIGEO'}, axis =1 )
 maps.head(5)
 
 
-# In[13]:
+# In[8]:
 
 
 # Para poder hacer el merge, ambas columnas deben estar en el mismo formato: Object or srting to int
@@ -90,7 +90,7 @@ maps['UBIGEO'] = maps['UBIGEO'].astype(str).astype(int)
 maps.head(5)
 
 
-# In[14]:
+# In[9]:
 
 
 # Vemos los valores que tienen para saber como proceder con el filtrado
@@ -102,7 +102,7 @@ valores_unicos
 
 # ### Creamos las funciones que nos ayudarán a filtrar instituciones
 
-# In[15]:
+# In[10]:
 
 
 # Función para filtrar escuelas por nivel
@@ -147,7 +147,7 @@ def contar_escuelas_por_distrito(base_nivel):
 
 # Creamos la base de datos
 
-# In[16]:
+# In[11]:
 
 
 nivel = 'Inicial'  # O el nivel que quieras
@@ -157,7 +157,7 @@ conteo_con_geom, total_escuelas = contar_escuelas_por_distrito(base_inicial)
 
 # Creamos el histograma y el mapa estático
 
-# In[17]:
+# In[12]:
 
 
 import matplotlib.pyplot as plt
@@ -188,7 +188,7 @@ plt.show()
 
 # Creamos la base de datos
 
-# In[18]:
+# In[13]:
 
 
 nivel = 'Primaria'  # O el nivel que quieras
@@ -198,7 +198,7 @@ conteo_con_geom, total_escuelas = contar_escuelas_por_distrito(base_primaria)
 
 # Creamos el histograma y el mapa estático
 
-# In[19]:
+# In[14]:
 
 
 import matplotlib.pyplot as plt
@@ -229,7 +229,7 @@ plt.show()
 
 # Creamos la base de datos
 
-# In[20]:
+# In[15]:
 
 
 nivel = 'Secundaria'  # O el nivel que quieras
@@ -239,7 +239,7 @@ conteo_con_geom, total_escuelas = contar_escuelas_por_distrito(base_secundaria)
 
 # Creamos el histograma y el mapa estático
 
-# In[21]:
+# In[16]:
 
 
 import matplotlib.pyplot as plt
@@ -270,7 +270,7 @@ plt.show()
 
 # Creamos la base de datos de Primarias solo para Huancavelica y Huancayo
 
-# In[22]:
+# In[17]:
 
 
 dataset_cv = pd.merge(maps, cv_data, how="inner", on="UBIGEO")
@@ -315,7 +315,7 @@ print(school_gdf.groupby(['Departamento', 'nivel_escolar']).size())
 
 # ### Análisis para HUANCAVELICA
 
-# In[23]:
+# In[18]:
 
 
 # Filter schools in Huancavelica
@@ -343,30 +343,14 @@ for idx, primary in huancavelica_primary.iterrows():
 
 huancavelica_primary['secondary_count'] = nearby_counts
 
-# Display statistics
-print("\nHuancavelica statistics:")
-print(f"Average secondary schools within 5km: {huancavelica_primary['secondary_count'].mean():.2f}")
-print(f"Maximum secondary schools: {huancavelica_primary['secondary_count'].max()}")
-print(f"Minimum secondary schools: {huancavelica_primary['secondary_count'].min()}")
-
 # Find schools with minimum and maximum counts
 huancavelica_min_school = huancavelica_primary.loc[huancavelica_primary['secondary_count'].idxmin()]
 huancavelica_max_school = huancavelica_primary.loc[huancavelica_primary['secondary_count'].idxmax()]
 
-print("\nPrimary school with fewest secondary schools nearby:")
-print(f"Name: {huancavelica_min_school['Nombre de SS.EE.']}")
-print(f"District: {huancavelica_min_school['Distrito']}")
-print(f"Secondary schools within 5km: {huancavelica_min_school['secondary_count']}")
-
-print("\nPrimary school with most secondary schools nearby:")
-print(f"Name: {huancavelica_max_school['Nombre de SS.EE.']}")
-print(f"District: {huancavelica_max_school['Distrito']}")
-print(f"Secondary schools within 5km: {huancavelica_max_school['secondary_count']}")
-
 
 # #### Huancavelica - Minimum Case
 
-# In[24]:
+# In[19]:
 
 
 # Plot for Huancavelica school with minimum secondary schools
@@ -443,7 +427,7 @@ print("Plot saved as 'huancavelica_min_secondary.png'")
 
 # #### Huancavelica - Maximum Case
 
-# In[25]:
+# In[20]:
 
 
 # Plot for Huancavelica school with maximum secondary schools
@@ -519,7 +503,7 @@ print("Plot saved as 'huancavelica_max_secondary.png'")
 
 # ### Análisis para AYACUCHO
 
-# In[26]:
+# In[21]:
 
 
 # Filter schools in Ayacucho
@@ -546,30 +530,15 @@ for idx, primary in ayacucho_primary.iterrows():
 
 ayacucho_primary['secondary_count'] = nearby_counts
 
-# Display statistics
-print("\nAyacucho statistics:")
-print(f"Average secondary schools within 5km: {ayacucho_primary['secondary_count'].mean():.2f}")
-print(f"Maximum secondary schools: {ayacucho_primary['secondary_count'].max()}")
-print(f"Minimum secondary schools: {ayacucho_primary['secondary_count'].min()}")
-
 # Find schools with minimum and maximum counts
 ayacucho_min_school = ayacucho_primary.loc[ayacucho_primary['secondary_count'].idxmin()]
 ayacucho_max_school = ayacucho_primary.loc[ayacucho_primary['secondary_count'].idxmax()]
 
-print("\nPrimary school with fewest secondary schools nearby:")
-print(f"Name: {ayacucho_min_school['Nombre de SS.EE.']}")
-print(f"District: {ayacucho_min_school['Distrito']}")
-print(f"Secondary schools within 5km: {ayacucho_min_school['secondary_count']}")
-
-print("\nPrimary school with most secondary schools nearby:")
-print(f"Name: {ayacucho_max_school['Nombre de SS.EE.']}")
-print(f"District: {ayacucho_max_school['Distrito']}")
-print(f"Secondary schools within 5km: {ayacucho_max_school['secondary_count']}")
 
 
 # #### Ayacucho - Minimum Case
 
-# In[27]:
+# In[22]:
 
 
 # Plot for Ayacucho school with minimum secondary schools
@@ -646,7 +615,7 @@ print("Plot saved as 'ayacucho_min_secondary.png'")
 
 # #### Ayacucho - Maximum Case
 
-# In[28]:
+# In[23]:
 
 
 # Plot for Ayacucho school with maximum secondary schools
@@ -722,7 +691,7 @@ print("Plot saved as 'ayacucho_max_secondary.png'")
 
 # ### Resumen
 
-# In[29]:
+# In[24]:
 
 
 # Create a summary dataframe
@@ -769,7 +738,7 @@ print(f"2. Primary schools in Ayacucho with no secondary schools within 5km: {ay
 
 # ### PARTE 1: Choropleth Maps for All Districts
 
-# In[31]:
+# In[25]:
 
 
 maps = gpd.read_file('../shape_file/DISTRITOS.shp')
@@ -838,7 +807,7 @@ display(peru_map)
 
 # ### PARTE 2: Proximity maps for Huancavelica and Ayacucho
 
-# In[33]:
+# In[ ]:
 
 
 # Loading district shapefile
@@ -973,18 +942,92 @@ def create_and_display_region_map(region_name):
     print("-" * 50)
 
 
-# In[34]:
+# In[ ]:
 
 
 # Display maps for both regions
 create_and_display_region_map('HUANCAVELICA')
 
 
-# In[35]:
+# In[ ]:
 
 
 create_and_display_region_map('AYACUCHO')
 
+
+# # Análisis del Contexto Geográfico: Huancavelica y Ayacucho 
+# 
+# ## Huancavelica
+# 
+# ### Observaciones del mapa
+# La visualización muestra claramente que:
+# - La escuela primaria con mayor cantidad de escuelas secundarias cercanas (22) está ubicada en el centro urbano de Huancavelica (capital).
+# - Las escuelas secundarias (puntos azules) están fuertemente concentradas a lo largo de la carretera principal y el centro urbano.
+# - La concentración urbana de servicios educativos es extrema, con prácticamente todas las escuelas secundarias agrupadas en un único núcleo.
+# - Los círculos verdes de 5km alrededor de las escuelas primarias con mayor acceso a secundarias apenas cubren un área pequeña y centralizada del territorio.
+# 
+# ### Terreno
+# Huancavelica presenta una geografía montañosa severa que se evidencia en el mapa por:
+# - La presencia de numerosos ríos y quebradas (líneas azules/marrones sinuosas) que fragmentan el territorio.
+# - La concentración de asentamientos y vías de comunicación siguiendo los valles entre montañas.
+# - Las zonas periféricas al centro urbano principal muestran muy poca infraestructura vial y pocos asentamientos.
+# 
+# ### Accesibilidad
+# El mapa refuerza lo extremadamente limitada que es la accesibilidad:
+# - La infraestructura vial es mínima, con una carretera principal (PE-26) que atraviesa el territorio.
+# - Las comunidades alejadas del eje vial principal quedan prácticamente desconectadas.
+# - La distribución de escuelas secundarias sigue estrictamente el eje vial, evidenciando que la accesibilidad es el factor determinante.
+# 
+# ### Características Urbanas vs. Rurales
+# La imagen muestra un patrón mono-céntrico extremo:
+# - Un único centro urbano significativo (Huancavelica capital) concentra casi todos los servicios educativos secundarios.
+# - Localidades pequeñas como Sacsamarca, Antaccocha o Huaylacucho aparecen prácticamente desconectadas del centro principal.
+# - El contraste entre centro urbano (concentración de puntos azules) y periferia rural es dramático.
+# 
+# ## Ayacucho
+# 
+# ### Observaciones del mapa
+# La visualización muestra un patrón significativamente distinto:
+# - La escuela primaria con mayor número de escuelas secundarias cercanas (81) está ubicada en un entorno mucho más densamente poblado.
+# - La concentración de escuelas secundarias (puntos azules) dentro del radio de 5km es notablemente superior (81 vs. 22 en Huancavelica).
+# - Existe un patrón policéntrico, con múltiples marcadores de escuelas con alto acceso a educación secundaria.
+# - El área urbana representada muestra una estructura más compleja y extensa.
+# 
+# ### Terreno
+# Aunque también montañoso, el mapa de Ayacucho muestra:
+# - Un valle más amplio donde se ubica la ciudad principal, con más espacio para desarrollo urbano.
+# - Una red hidrográfica presente pero menos limitante que en Huancavelica.
+# - Zonas de menor pendiente que permiten asentamientos más dispersos y mejor conectados.
+# 
+# ### Accesibilidad
+# La red de conectividad se muestra significativamente más desarrollada:
+# - Mayor cantidad de vías secundarias que se ramifican desde las principales.
+# - Múltiples centros poblados conectados entre sí, no solo dependientes de un eje central.
+# - La distribución espacial de escuelas secundarias es menos lineal y más dispersa en el territorio.
+# 
+# ### Características Urbanas vs. Rurales
+# Ayacucho muestra un patrón más equilibrado:
+# - Un centro urbano principal de mayor tamaño y complejidad (Ayacucho/Huamanga).
+# - Centros urbanos secundarios visibles en el mapa como San Juan de Viñaca, Compañía, entre otros.
+# - Mayor densidad poblacional evidenciada por la concentración de asentamientos y topónimos en el mapa.
+# - La cifra de 81 escuelas secundarias en un radio de 5km evidencia un entorno mucho más urbanizado y con mayor oferta educativa.
+# 
+# ## Conclusiones actualizadas
+# 
+# 1. **Contraste en el acceso educativo**: La diferencia entre 22 escuelas secundarias (máximo en Huancavelica) vs. 81 escuelas secundarias (máximo en Ayacucho) refleja una brecha significativa en las oportunidades educativas entre ambas regiones.
+# 
+# 2. **Patrones de urbanización distintos**: Huancavelica presenta un modelo mono-céntrico extremo, mientras Ayacucho muestra un patrón más equilibrado y policéntrico.
+# 
+# 3. **Influencia determinante de la topografía**: En Huancavelica, la concentración lineal de escuelas a lo largo del eje vial principal evidencia cómo el relieve montañoso restringe severamente el desarrollo de infraestructura educativa.
+# 
+# 4. **Implicaciones para políticas públicas**: 
+#    - En Huancavelica se requieren soluciones más radicales para garantizar acceso a educación secundaria (internados regionales, educación a distancia, transporte subsidiado).
+#    - En Ayacucho, aunque con mejor situación relativa, persisten zonas periféricas desconectadas que necesitan intervenciones focalizadas.
+# 
+# 5. **Centralización vs. Descentralización**: La distribución educativa en Huancavelica ejemplifica un patrón de centralización extrema de servicios, mientras Ayacucho presenta un modelo más descentralizado con múltiples núcleos educativos.
+# 
+# Estas observaciones basadas en los mapas refuerzan la necesidad de planificación territorial diferenciada para ambas regiones, considerando sus particulares condiciones geográficas y patrones de asentamiento.
+# 
 
 # In[ ]:
 
