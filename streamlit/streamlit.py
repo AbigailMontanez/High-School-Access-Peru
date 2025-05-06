@@ -2,8 +2,8 @@
 
 # --- Librerías necesarias ---
 import streamlit as st
-import geopandas as gpd
 import pandas as pd
+import geopandas as gpd
 import folium
 from folium import Choropleth, LayerControl
 import matplotlib.pyplot as plt
