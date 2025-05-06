@@ -17,7 +17,7 @@
 # 
 # ### Importar librerías
 
-# In[3]:
+# In[1]:
 
 
 # Manipulación de datos
@@ -49,14 +49,14 @@ import os
 
 # ### Lectura de la bbdd de  instituciones
 
-# In[4]:
+# In[2]:
 
 
 cv_data = pd.read_html('listado_iiee.xls')[0]
 print(cv_data.head())
 
 
-# In[5]:
+# In[3]:
 
 
 # Cambiamos el nombre de Ubigeo para poder hacer el merge luego
@@ -66,14 +66,14 @@ cv_data.head(5)
 
 # ### Importación del Shape File por distritos
 
-# In[6]:
+# In[4]:
 
 
 maps = gpd.read_file('../shape_file/DISTRITOS.shp')
 maps.head(5)
 
 
-# In[7]:
+# In[5]:
 
 
 # Nos quedamos con las columnas relevantes y cambiamos el nombre de IDDIST para hacer el merge luego
@@ -82,7 +82,7 @@ maps = maps.rename({'IDDIST':'UBIGEO'}, axis =1 )
 maps.head(5)
 
 
-# In[8]:
+# In[6]:
 
 
 # Para poder hacer el merge, ambas columnas deben estar en el mismo formato: Object or srting to int
@@ -90,7 +90,7 @@ maps['UBIGEO'] = maps['UBIGEO'].astype(str).astype(int)
 maps.head(5)
 
 
-# In[9]:
+# In[7]:
 
 
 # Vemos los valores que tienen para saber como proceder con el filtrado
@@ -102,7 +102,7 @@ valores_unicos
 
 # ### Creamos las funciones que nos ayudarán a filtrar instituciones
 
-# In[10]:
+# In[8]:
 
 
 # Función para filtrar escuelas por nivel
@@ -147,7 +147,7 @@ def contar_escuelas_por_distrito(base_nivel):
 
 # Creamos la base de datos
 
-# In[11]:
+# In[9]:
 
 
 nivel = 'Inicial'  # O el nivel que quieras
@@ -157,7 +157,7 @@ conteo_con_geom, total_escuelas = contar_escuelas_por_distrito(base_inicial)
 
 # Creamos el histograma y el mapa estático
 
-# In[12]:
+# In[10]:
 
 
 import matplotlib.pyplot as plt
@@ -188,7 +188,7 @@ plt.show()
 
 # Creamos la base de datos
 
-# In[13]:
+# In[11]:
 
 
 nivel = 'Primaria'  # O el nivel que quieras
@@ -198,7 +198,7 @@ conteo_con_geom, total_escuelas = contar_escuelas_por_distrito(base_primaria)
 
 # Creamos el histograma y el mapa estático
 
-# In[14]:
+# In[12]:
 
 
 import matplotlib.pyplot as plt
@@ -229,7 +229,7 @@ plt.show()
 
 # Creamos la base de datos
 
-# In[15]:
+# In[13]:
 
 
 nivel = 'Secundaria'  # O el nivel que quieras
@@ -239,7 +239,7 @@ conteo_con_geom, total_escuelas = contar_escuelas_por_distrito(base_secundaria)
 
 # Creamos el histograma y el mapa estático
 
-# In[16]:
+# In[14]:
 
 
 import matplotlib.pyplot as plt
@@ -270,7 +270,7 @@ plt.show()
 
 # Creamos la base de datos de Primarias solo para Huancavelica y Huancayo
 
-# In[17]:
+# In[15]:
 
 
 dataset_cv = pd.merge(maps, cv_data, how="inner", on="UBIGEO")
@@ -315,7 +315,7 @@ print(school_gdf.groupby(['Departamento', 'nivel_escolar']).size())
 
 # ### Análisis para HUANCAVELICA
 
-# In[18]:
+# In[16]:
 
 
 # Filter schools in Huancavelica
@@ -350,7 +350,7 @@ huancavelica_max_school = huancavelica_primary.loc[huancavelica_primary['seconda
 
 # #### Huancavelica - Minimum Case
 
-# In[19]:
+# In[17]:
 
 
 # Plot for Huancavelica school with minimum secondary schools
@@ -427,7 +427,7 @@ print("Plot saved as 'huancavelica_min_secondary.png'")
 
 # #### Huancavelica - Maximum Case
 
-# In[20]:
+# In[18]:
 
 
 # Plot for Huancavelica school with maximum secondary schools
@@ -503,7 +503,7 @@ print("Plot saved as 'huancavelica_max_secondary.png'")
 
 # ### Análisis para AYACUCHO
 
-# In[21]:
+# In[19]:
 
 
 # Filter schools in Ayacucho
@@ -538,7 +538,7 @@ ayacucho_max_school = ayacucho_primary.loc[ayacucho_primary['secondary_count'].i
 
 # #### Ayacucho - Minimum Case
 
-# In[22]:
+# In[20]:
 
 
 # Plot for Ayacucho school with minimum secondary schools
@@ -615,7 +615,7 @@ print("Plot saved as 'ayacucho_min_secondary.png'")
 
 # #### Ayacucho - Maximum Case
 
-# In[23]:
+# In[21]:
 
 
 # Plot for Ayacucho school with maximum secondary schools
@@ -691,7 +691,7 @@ print("Plot saved as 'ayacucho_max_secondary.png'")
 
 # ### Resumen
 
-# In[24]:
+# In[22]:
 
 
 # Create a summary dataframe
@@ -738,7 +738,7 @@ print(f"2. Primary schools in Ayacucho with no secondary schools within 5km: {ay
 
 # ### PARTE 1: Choropleth Maps for All Districts
 
-# In[25]:
+# In[23]:
 
 
 maps = gpd.read_file('../shape_file/DISTRITOS.shp')

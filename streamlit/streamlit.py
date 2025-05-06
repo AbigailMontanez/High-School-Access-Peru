@@ -18,10 +18,10 @@ st.set_page_config(page_title="Análisis Geoespacial de Colegios en Perú", layo
 @st.cache_data
 def load_data():
     # 1. Cargar colegios
-    cv_data = pd.read_html('listado_iiee.xls')[0]
+    cv_data = pd.read_html('../src/listado_iiee.xls')[0]
     
     # 2. Cargar shapefile de distritos
-    maps = gpd.read_file('DISTRITOS.shp')
+    maps = gpd.read_file('../shape_file/DISTRITOS.shp')
     
     # 3. Ajustes de formato
     maps = maps[['IDDIST', 'geometry']]
